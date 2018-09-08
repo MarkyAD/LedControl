@@ -4,9 +4,9 @@
 /*
  Now we need a LedControl to work with.
  ***** These pin numbers will probably not work with your hardware *****
- pin 12 is connected to the DataIn 
- pin 11 is connected to the CLK 
- pin 10 is connected to LOAD 
+ pin 12 is connected to the DataIn
+ pin 11 is connected to the CLK
+ pin 10 is connected to LOAD
  We have only a single MAX72XX.
  */
 LedControl lc=LedControl(12,11,10,1);
@@ -29,7 +29,7 @@ void setup() {
 
 /*
  This method will display the characters for the
- word "Arduino" one after the other on digit 0. 
+ word "Arduino" one after the other on digit 0.
  */
 void writeArduinoOn7Segment() {
   lc.setChar(0,0,'a',false);
@@ -48,7 +48,7 @@ void writeArduinoOn7Segment() {
   delay(delaytime);
   lc.clearDisplay(0);
   delay(delaytime);
-} 
+}
 
 /*
   This method will scroll all the hexa-decimal
@@ -67,7 +67,7 @@ void scrollDigits() {
   delay(delaytime);
 }
 
-void loop() { 
+void loop() {
   writeArduinoOn7Segment();
   scrollDigits();
 }
