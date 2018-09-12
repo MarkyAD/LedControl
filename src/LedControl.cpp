@@ -214,18 +214,18 @@ void LedControl::setByte(int addr, int digit, byte value, boolean dp) {
 
 void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data) {
     //Create an array with the data to shift out
-    int offset=addr*2;
     int maxbytes=maxDevices*2;
 
     for(int i=0;i<maxbytes;i++)
         spidata[i]=(byte)0;
 
 #if (defined(ESP8266))
-      offset = (maxbytes-(addr*2))-1;
-      //put our device data into the array
-      spidata[offset] = data;
-      spidata[offset-1] = opcode;
+    int offset = (maxbytes-(addr*2))-1;
+    //put our device data into the array
+    spidata[offset] = data;
+    spidata[offset-1] = opcode;
 #else
+    int offset=addr*2;
     //put our device data into the array
     spidata[offset+1]=opcode;
     spidata[offset]=data;
