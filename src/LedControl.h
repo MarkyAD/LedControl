@@ -30,7 +30,9 @@
 #if (defined(__AVR__))
 #include <avr/pgmspace.h>
 #else
+#if (defined(ESP8266))
 #include <pgmspace.h>
+#endif
 #endif
 
 #if (ARDUINO >= 100)

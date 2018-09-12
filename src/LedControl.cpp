@@ -219,18 +219,32 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
 
     for(int i=0;i<maxbytes;i++)
         spidata[i]=(byte)0;
+
+#if (defined(ESP8266))
+      offset = (maxbytes-(addr*2))-1;
+      //put our device data into the array
+      spidata[offset] = data;
+      spidata[offset-1] = opcode;
+#else
     //put our device data into the array
     spidata[offset+1]=opcode;
     spidata[offset]=data;
+#endif
+
     if (SPI_MOSI == -1) {
       SPI.beginTransaction(ledSpiSettings);
       //enable the line
       digitalWrite(SPI_CS,LOW);
+#if (defined(ESP8266))
+      //write out data in one chunk
+      SPI.transferBytes((const uint8_t *) &spidata, NULL, maxbytes);
+#else
       //Now shift out the data
       for(int i=maxbytes;i>0;i--)
       {
         SPI.transfer(spidata[i-1]);
       }
+#endif
       //latch the data onto the display
       digitalWrite(SPI_CS,HIGH);
       SPI.endTransaction();
