@@ -24,7 +24,7 @@
  *    OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
+#include <SPI.h>
 #include "LedControl.h"
 
 //the opcodes for the MAX7221 and MAX7219
@@ -44,9 +44,7 @@
 #define OP_DISPLAYTEST 15
 
 LedControl::LedControl(int dataPin, int clkPin, int csPin, int numDevices) {
-    SPI_MOSI=dataPin;
-    SPI_CLK=clkPin;
-    SPI_CS=csPin;
+    SPI_MOSI=dataPin; SPI_CLK=clkPin; SPI_CS=csPin;
     if(numDevices<=0 || numDevices>8 )
         numDevices=8;
     maxDevices=numDevices;
@@ -54,10 +52,24 @@ LedControl::LedControl(int dataPin, int clkPin, int csPin, int numDevices) {
     pinMode(SPI_CLK,OUTPUT);
     pinMode(SPI_CS,OUTPUT);
     digitalWrite(SPI_CS,HIGH);
-    SPI_MOSI=dataPin;
+    spiInit(numDevices);
+}
+
+LedControl::LedControl(int csPin, int numDevices) {
+    SPI_MOSI=-1; SPI_CLK=-1; SPI_CS=csPin;
+    if(numDevices<=0 || numDevices>8 )
+        numDevices=8;
+    maxDevices=numDevices;
+    pinMode(SPI_CS,OUTPUT);
+    digitalWrite(SPI_CS,HIGH);
+    SPI.begin();
+    spiInit(numDevices);
+}
+
+void LedControl::spiInit(int numDevices) {
     for(int i=0;i<64;i++)
         status[i]=0x00;
-    for(int i=0;i<maxDevices;i++) {
+    for(int i=0;i<numDevices;i++) {
         spiTransfer(i,OP_DISPLAYTEST,0);
         //scanlimit is set to max on startup
         setScanLimit(i,7);
@@ -210,13 +222,26 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
     //put our device data into the array
     spidata[offset+1]=opcode;
     spidata[offset]=data;
-    //enable the line
-    digitalWrite(SPI_CS,LOW);
-    //Now shift out the data
-    for(int i=maxbytes;i>0;i--)
-        shiftOut(SPI_MOSI,SPI_CLK,MSBFIRST,spidata[i-1]);
-    //latch the data onto the display
-    digitalWrite(SPI_CS,HIGH);
+    if (SPI_MOSI == -1) {
+      SPI.beginTransaction(ledSpiSettings);
+      //enable the line
+      digitalWrite(SPI_CS,LOW);
+      //Now shift out the data
+      for(int i=maxbytes;i>0;i--)
+      {
+        SPI.transfer(spidata[i-1]);
+      }
+      //latch the data onto the display
+      digitalWrite(SPI_CS,HIGH);
+      SPI.endTransaction();
+    } else {
+      //enable the line
+      digitalWrite(SPI_CS,LOW);
+      //Now shift out the data
+      for(int i=maxbytes;i>0;i--)
+          shiftOut(SPI_MOSI,SPI_CLK,MSBFIRST,spidata[i-1]);
+      //latch the data onto the display
+      digitalWrite(SPI_CS,HIGH);
+    }
 }
-
 

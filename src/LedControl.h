@@ -39,6 +39,8 @@
 #include <WProgram.h>
 #endif
 
+#include <SPI.h>
+
 /*
  * Segments to be switched on for characters and digits on
  * 7-Segment Displays
@@ -62,20 +64,25 @@ const static byte charTable [] PROGMEM  = {
     B00000000,B00111011,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000
 };
 
+/* Hardware SPI settings */
+const static SPISettings ledSpiSettings(8000000, MSBFIRST, SPI_MODE0);
+
 class LedControl {
     private :
         /* The array for shifting the data to the devices */
         byte spidata[16];
+        /* Initialize either hardware or software SPI */
+        void spiInit(int numDevices);
         /* Send out a single command to the device */
         void spiTransfer(int addr, byte opcode, byte data);
 
         /* We keep track of the led-status for all 8 devices in this array */
         byte status[64];
-        /* Data is shifted out of this pin*/
+        /* Data is shifted out of this pin */
         int SPI_MOSI;
         /* The clock is signaled on this pin */
         int SPI_CLK;
-        /* This one is driven LOW for chip selectzion */
+        /* This one is driven LOW for chip selection */
         int SPI_CS;
         /* The maximum number of devices we use */
         int maxDevices;
@@ -90,6 +97,14 @@ class LedControl {
          * numDevices	maximum number of devices that can be controled
          */
         LedControl(int dataPin, int clkPin, int csPin, int numDevices=1);
+
+        /*
+         * Create a new controler (hardware SPI)
+         * Params :
+         * csPin		pin for selecting the device
+         * numDevices	maximum number of devices that can be controled
+         */
+        LedControl(int csPin, int numDevices=1);
 
         /*
          * Gets the number of devices attached to this LedControl.
