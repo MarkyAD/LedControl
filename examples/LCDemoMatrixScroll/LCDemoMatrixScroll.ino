@@ -5,12 +5,15 @@
 #include <LedControl.h>
 
 // device
-int DIN = 12;
-int CS =  11;
-int CLK = 10;
+int DIN_PIN = 13;
+int CLK_PIN = 11;
+int CS_PIN  = 10;
 int numModules = 4;
 
-LedControl lc=LedControl(DIN, CLK, CS, numModules);
+// hardware SPI
+LedControl lc=LedControl(CS_PIN, numModules);
+// software SPI
+//LedControl lc=LedControl(DIN_PIN, CLK_PIN, CS_PIN, numModules);
 
 // icons
 byte arrow[8] =  {0x18,0x3C,0x5A,0x99,0x18,0x18,0x18,0x24};
@@ -64,3 +67,4 @@ void printByte_scroll(byte character [], int addr) {
     delay(20);         
   }  
 }
+

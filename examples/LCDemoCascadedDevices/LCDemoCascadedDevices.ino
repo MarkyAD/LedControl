@@ -4,13 +4,17 @@
 /*
  Now we need a LedControl to work with.
  ***** These pin numbers will probably not work with your hardware *****
- pin 12 is connected to the DataIn
+ pin 13 is connected to the DataIn
  pin 11 is connected to the CLK
  pin 10 is connected to LOAD
  ***** Please set the number of devices you have *****
  But the maximum default of 8 MAX72XX wil also work.
  */
-LedControl lc=LedControl(12,11,10,8);
+
+// hardware SPI
+LedControl lc=LedControl(10,1);
+// software SPI
+//LedControl lc=LedControl(13,11,10,1);
 
 /* we always wait a bit between updates of the display */
 unsigned long delaytime=500;
