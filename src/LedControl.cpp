@@ -27,7 +27,7 @@
 #include <SPI.h>
 #include "LedControl.h"
 
-//the opcodes for the MAX7221 and MAX7219
+// the opcodes for the MAX7221 and MAX7219
 #define OP_NOOP   0
 #define OP_DIGIT0 1
 #define OP_DIGIT1 2
@@ -71,12 +71,12 @@ void LedControl::spiInit(int numDevices) {
         status[i]=0x00;
     for(int i=0;i<numDevices;i++) {
         spiTransfer(i,OP_DISPLAYTEST,0);
-        //scanlimit is set to max on startup
+        // scanlimit is set to max on startup
         setScanLimit(i,7);
-        //decode is done in source
+        // decode is done in source
         spiTransfer(i,OP_DECODEMODE,0);
         clearDisplay(i);
-        //we go into shutdown-mode on startup
+        // we go into shutdown-mode on startup
         shutdown(i,true);
     }
 }
@@ -191,7 +191,7 @@ void LedControl::setChar(int addr, int digit, char value, boolean dp) {
     offset=addr*8;
     index=(byte)value;
     if(index >127) {
-        //no defined beyond index 127, so we use the space char
+        // no defined beyond index 127, so we use the space char
         index=32;
     }
     v=pgm_read_byte_near(charTable + index);
@@ -213,48 +213,38 @@ void LedControl::setByte(int addr, int digit, byte value, boolean dp) {
 }
 
 void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data) {
-    //Create an array with the data to shift out
     int maxbytes=maxDevices*2;
-
-    for(int i=0;i<maxbytes;i++)
-        spidata[i]=(byte)0;
-
-#if (defined(ESP8266))
     int offset = (maxbytes-(addr*2))-1;
-    //put our device data into the array
+
+    // zero out old data
+    memset(&spidata, 0, sizeof(spidata));
+
+    // put our device data into the array
     spidata[offset] = data;
     spidata[offset-1] = opcode;
-#else
-    int offset=addr*2;
-    //put our device data into the array
-    spidata[offset+1]=opcode;
-    spidata[offset]=data;
-#endif
 
     if (SPI_MOSI == -1) {
       SPI.beginTransaction(ledSpiSettings);
-      //enable the line
+      // enable the line
       digitalWrite(SPI_CS,LOW);
 #if (defined(ESP8266))
-      //write out data in one chunk
+      // write data by chunk
       SPI.transferBytes((const uint8_t *) &spidata, NULL, maxbytes);
 #else
-      //Now shift out the data
-      for(int i=maxbytes;i>0;i--)
-      {
-        SPI.transfer(spidata[i-1]);
-      }
+      // now shift out the data
+      for(int i=0;i<maxbytes;i++)
+        SPI.transfer(spidata[i]);
 #endif
-      //latch the data onto the display
+      // latch the data onto the display
       digitalWrite(SPI_CS,HIGH);
       SPI.endTransaction();
     } else {
-      //enable the line
+      // enable the line
       digitalWrite(SPI_CS,LOW);
-      //Now shift out the data
-      for(int i=maxbytes;i>0;i--)
-          shiftOut(SPI_MOSI,SPI_CLK,MSBFIRST,spidata[i-1]);
-      //latch the data onto the display
+      // now shift out the data
+      for(int i=0;i<maxbytes;i++)
+        shiftOut(SPI_MOSI,SPI_CLK,MSBFIRST,spidata[i]);
+      // latch the data onto the display
       digitalWrite(SPI_CS,HIGH);
     }
 }
