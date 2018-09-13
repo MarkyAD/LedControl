@@ -214,7 +214,7 @@ void LedControl::setByte(int addr, int digit, byte value, boolean dp) {
 
 void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data) {
     int maxbytes=maxDevices*2;
-    int offset = (maxbytes-(addr*2))-1;
+    int offset = maxbytes-(addr*2)-1;
 
     // zero out old data
     memset(&spidata, 0, sizeof(spidata));
@@ -227,11 +227,10 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
       SPI.beginTransaction(ledSpiSettings);
       // enable the line
       digitalWrite(SPI_CS,LOW);
+      // now shift out the data
 #if (defined(ESP8266))
-      // write data by chunk
       SPI.transferBytes((const uint8_t *) &spidata, NULL, maxbytes);
 #else
-      // now shift out the data
       for(int i=0;i<maxbytes;i++)
         SPI.transfer(spidata[i]);
 #endif
