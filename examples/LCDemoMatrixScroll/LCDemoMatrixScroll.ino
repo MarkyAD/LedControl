@@ -5,9 +5,9 @@
 #include <LedControl.h>
 
 // device
-int DIN_PIN = 13;
-int CLK_PIN = 11;
 int CS_PIN  = 10;
+int DIN_PIN = 11;
+int CLK_PIN = 13;
 int numModules = 4;
 
 // hardware SPI

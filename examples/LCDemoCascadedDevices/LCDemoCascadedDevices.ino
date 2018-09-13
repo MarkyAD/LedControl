@@ -14,7 +14,7 @@
 // hardware SPI
 LedControl lc=LedControl(10,1);
 // software SPI
-//LedControl lc=LedControl(13,11,10,1);
+//LedControl lc=LedControl(11,13,10,1);
 
 /* we always wait a bit between updates of the display */
 unsigned long delaytime=500;
