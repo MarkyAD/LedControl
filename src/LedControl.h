@@ -73,8 +73,8 @@ class LedControl {
     private :
         /* The array for shifting the data to the devices */
         byte spidata[16];
-        /* Initialize either hardware or software SPI */
-        void spiInit(int numDevices);
+        /* Initialize using either hardware or software SPI */
+        void deviceInit(int numDevices);
         /* Send out a single command to the device */
         void spiTransfer(int addr, byte opcode, byte data);
 

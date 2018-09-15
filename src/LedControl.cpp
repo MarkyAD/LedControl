@@ -52,7 +52,7 @@ LedControl::LedControl(int dataPin, int clkPin, int csPin, int numDevices) {
     pinMode(SPI_CLK,OUTPUT);
     pinMode(SPI_CS,OUTPUT);
     digitalWrite(SPI_CS,HIGH);
-    spiInit(numDevices);
+    deviceInit(numDevices);
 }
 
 LedControl::LedControl(int csPin, int numDevices) {
@@ -63,12 +63,11 @@ LedControl::LedControl(int csPin, int numDevices) {
     pinMode(SPI_CS,OUTPUT);
     digitalWrite(SPI_CS,HIGH);
     SPI.begin();
-    spiInit(numDevices);
+    deviceInit(numDevices);
 }
 
-void LedControl::spiInit(int numDevices) {
-    for(int i=0;i<64;i++)
-        status[i]=0x00;
+void LedControl::deviceInit(int numDevices) {
+    memset(&status, 0, sizeof(status));
     for(int i=0;i<numDevices;i++) {
         spiTransfer(i,OP_DISPLAYTEST,0);
         // scanlimit is set to max on startup
