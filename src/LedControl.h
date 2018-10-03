@@ -27,10 +27,10 @@
 #ifndef LedControl_h
 #define LedControl_h
 
-#if (defined(__AVR__))
+#if defined(__AVR__)
 #include <avr/pgmspace.h>
 #else
-#if (defined(ESP8266))
+#if (defined(ESP8266) || defined(ESP32))
 #include <pgmspace.h>
 #endif
 #endif

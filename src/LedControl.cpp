@@ -227,8 +227,10 @@ void LedControl::spiTransfer(int addr, volatile byte opcode, volatile byte data)
       // enable the line
       digitalWrite(SPI_CS,LOW);
       // now shift out the data
-#if (defined(ESP8266))
+#if defined(ESP8266)
       SPI.transferBytes((const uint8_t *) &spidata, NULL, maxbytes);
+#elseif defined(ESP32)
+      SPI.transferBytes((uint8_t *) &spidata, NULL, maxbytes);
 #else
       for(int i=0;i<maxbytes;i++)
         SPI.transfer(spidata[i]);
